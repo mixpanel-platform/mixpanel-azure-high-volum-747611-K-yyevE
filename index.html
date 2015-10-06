@@ -5,11 +5,287 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/css/reset.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.css">
     <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.9/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.9/css/jquery.dataTables.min.css">
+    <style>
+      #run {
+        margin-top:5px;
+        float:left;
+        clear:both;
+        padding: 6px 12px;
+        background-color: #61adf0;
+        background-image: -webkit-linear-gradient(#6ab5f2,#53a0ee);
+        background-image: linear-gradient(#6ab5f2,#53a0ee);
+        box-shadow: inset 0 1px 1px #77bdf4,0 2px 2px -1px rgba(0,0,0,0.2);
+        text-transform: uppercase;
+        border: 1px solid #4d93d7;
+        color: #fff;
+        text-shadow: 0 -1px 0 rgba(0,0,0,0.2);
+        border-radius: 3px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+    </style>
   </head>
   <body class="mixpanel-platform-body">
-    <h1>Hello, World!</h1>
+    <div class="mixpanel-platform-section">
+      <div id="dateRange" style="float: left;"></div>
+      <button id="run" value="Run">Run</button>
+      <div style="clear:both"></div>
+    </div>
+    <table id="table" class="display" width="100%"></table>
     <script>
-      // Run queries and display results here
+    
+      /*  
+      ToDo
+        Add force cache button
+        Never Cache Today's Date
+        Graph Data based on the column selected
+        Refactor the get/cache
+        UI Loading timer
+      */
+    
+      /*  Sort including ',' */
+     function naturalSort (a, b) {
+        aLower = suffix(a.split(' - ')[0].replace(/,/g,''));
+        bLower = suffix(b.split(' - ')[0].replace(/,/g,''));
+        return aLower - bLower;
+      }
+      
+      
+      /*  Flat Keys for obj to Sort */
+      function obj2array(json_data){
+        var result = [];
+        _.each(_.keys(json_data), function(key) {
+          result.push(key);
+        });
+        return result;
+      }
+      
+      /*  Reverse our Suffix */
+      function suffix(numberString){
+        length = numberString.length;
+        lastChar = numberString[length - 1]
+        number = Number(numberString.slice(0, length - 1))
+        switch (lastChar) {
+          case 'K':
+            value = number * 1000
+            break;
+          case 'B':
+            value = number * 1000000000
+            break;
+          case 'M':
+            value = number * 1000000
+            break;
+          default:
+            value = Number(numberString)
+            break;
+        } 
+        return value
+      }
+      
+      
+      /*  Structure Data for Post */
+      set = function(data, distinct) {
+        update = {
+          "$set": data,
+        }
+        send(update, distinct);
+      }
+      
+      /*  Post Cache */
+      send = function(update, distinct) {
+        token = "5e1e1a9c5b3420a5700f9daa06c94c16"
+        $.extend(update, {
+          "$token": token,
+          "$distinct_id": distinct
+        })
+        var proto = document.location.protocol;
+        var setUrl = proto + "//api.mixpanel.com/engage";
+        var payload = { 'data': btoa(JSON.stringify(update)), "ip": 0, "verbose": 1 };
+        console.log('set', payload)
+        setXHR = new XMLHttpRequest();
+        setXHR.open("POST", setUrl, true);
+        setXHR.send($.param(payload))
+      }
+      
+      /*  Get Cache */
+      get = function(distinct) {
+        return MP.api.query('/api/2.0/engage', {'distinct_id': distinct})
+      }
+      
+      var eventSelector = $('#eventSelect').MPEventSelect({limit: 500});
+      var dateSelector = $('#dateRange').MPDatepicker();
+      var eventName, dates;
+      
+      $('#table').DataTable({
+        columns: [
+          { title: "Date", data: "Date" },
+          { title: "Median Percentile Portal Ready", data: "Median Percentile TotalTimeToPortalReady" },
+          { title: "95th Percentile Portal Ready", data: "95th Percentile TotalTimeToPortalReady" },
+          { title: "Median Percentile StartBoard Ready", data: "Median Percentile TotalTimeToStartBoardReady" },
+          { title: "95th Percentile StartBoard Ready", data: "95th Percentile TotalTimeToStartBoardReady" },
+          { title: "Median Percentile DeepLink Ready", data: "Median Percentile TotalTimeToDeepLinkReady" },
+          { title: "95th Percentile Deeplink Ready", data: "95th Percentile TotalTimeToDeepLinkReady" },
+        ]
+      })
+      
+      /*  Nested queries
+          Will request until buckets are 1 unit wide
+      */
+      nestedQuery = function (percentile, parameters, event, date) {
+        result[date][event][percentile] = result[date][event][percentile] || {count: 0};
+        var endpoint = 'https://mixpanel.com/api/2.0/segmentation/numeric';
+        MP.api.query(endpoint, parameters).done(function(Data){
+          var queryData = result[date][event][percentile]
+          queryData.total = queryData.total || MP.Data.inst(Data.data.values).sum().sum().values();
+          var tempParams = parameters
+          var queryBuckets = MP.Data.inst(Data.data.values).sum().values();
+          var queryList = obj2array(queryBuckets).sort(naturalSort);
+          
+          for (index in queryList) {
+            var queryBucket = queryList[index];
+            var counts = queryBuckets[queryBucket]
+            if ((queryData['count'] + counts) / queryData['total'] >= percentile) {
+              break;
+            }
+            queryData['count'] += queryBuckets[queryBucket];
+          }
+          /*  Edge Case where buckets fail because of silly rounding */
+          try {
+            var queryBounds = queryBucket.replace(/,/g,'').split(' - ');
+            queryBounds = queryBounds.map(suffix)
+          }
+          catch(err){
+            console.log(event, date)
+            queryBounds = ['No Numeric Data']
+            pending -= 1;
+          }
+
+          tableData[date] = tableData[date] || {}
+          
+          if (queryBounds.length == 1) {
+            queryData.value = queryBounds[0]
+            var eventKey = String(percentile + ' ' + event)
+            tableData[date][eventKey] = queryBounds[0]
+            pending -= 1;
+            console.log(pending);
+            var sendData = {}
+            sendData[eventKey] = queryBounds[0]
+            set(sendData, date)
+            if (pending <= 0) {
+              drawTable(tableData)
+            }
+          } else {
+            var zero = 'number(properties["Duration"]) > 0 and '
+            var lowerBound = '(number(properties["Duration"]) >= ' + queryBounds[0];
+            var upperBound = ' and number(properties["Duration"]) <=' + queryBounds[1]+ ')';
+            tempParams.where = zero + lowerBound + upperBound;
+            nestedQuery(percentile, tempParams, event, date);
+          }
+        }).fail(function($xhr) {
+          console.log('error with request', $xhr);
+          pending -= 1;
+          if (pending <= 0){
+            drawTable(tableData)
+          }
+        });
+      }
+      
+      /*  Draw Table Function 
+          Expects to be keys of the current values
+      */
+      
+      drawTable= function(data){
+        var rows = []
+        for (rowDate in data) {
+          var value = tableData[rowDate]
+          rows.push({
+            'Date': rowDate,
+            'Median Percentile TotalTimeToPortalReady': value['0.5 TotalTimeToPortalReady'],
+            '95th Percentile TotalTimeToPortalReady': value['0.95 TotalTimeToPortalReady'],
+            'Median Percentile TotalTimeToStartBoardReady': value['0.5 TotalTimeToStartBoardReady'],
+            '95th Percentile TotalTimeToStartBoardReady': value['0.95 TotalTimeToStartBoardReady'],
+            'Median Percentile TotalTimeToDeepLinkReady': value['0.5 TotalTimeToDeepLinkReady'],
+            '95th Percentile TotalTimeToDeepLinkReady': value['0.95 TotalTimeToDeepLinkReady'],
+          })
+        }
+        
+        var table = $('#table').DataTable();
+        table.rows.add(rows).draw();
+      }
+      
+      /*  Initial Query Logic */
+      var runQuery = function(){
+        var forceCache = false
+        var params = {}
+        tableData = {}
+        var datePromises = []
+        var dateArray = []
+        pending = 0;
+        var table = $('#table').DataTable();
+        table
+          .clear()
+          .draw();
+          
+        var endpoint = 'https://mixpanel.com/api/2.0/segmentation/numeric'
+        var eventList = ['TotalTimeToPortalReady', 'TotalTimeToStartBoardReady', 'TotalTimeToDeepLinkReady']
+        var percentiles = [.5, .95]
+        result = {}
+        var myDate = new Date(dates.from)
+        
+        while (myDate <= new Date(dates.to)) { 
+          var date = myDate.toLocaleString().split(',')[0]
+          result[date] = {};
+          myDate.setDate(myDate.getDate() + 1);
+          datePromises.push(get(date));
+          dateArray.push(date)
+        }
+          
+        Promise.all(datePromises).then(function(promiseArray){
+          for (index in promiseArray) {
+            var date = dateArray[index]
+            var dateObj = promiseArray[index]
+            results = dateObj.results[0]
+            if (!$.isEmptyObject(results)) {
+              tableData[date] = results.$properties
+            }
+          
+            for (var index in eventList) {
+              var event = eventList[index]
+              params[event] = {}
+              result[date][event] = {};
+              for (percentIndex in percentiles){
+                percent = percentiles[percentIndex]
+                params[event][percent] = {
+                  event: event,
+                  where: 'number(properties["Duration"]) > 0',
+                  from: new Date(date),
+                  to: new Date(date),
+                  on: 'number(properties["Duration"])',
+                  unit: 'day',
+                  buckets: 2,
+                  allow_more_buckets:true,
+                };
+                var eventKey = String(percent + ' ' + event)
+                if (forceCache || typeof tableData[date] == 'undefined' || isNaN(tableData[date][eventKey])) {
+                  console.log("Cache non existant: " + date)
+                  pending += 1;
+                  nestedQuery(percent, params[event][percent], event, date);
+                }
+              }
+            }
+          }
+          if (pending <= 0) {
+            drawTable(tableData)
+          }
+        });
+      }
+      
+      $('#run').on('click', function(e){
+        dates = $('#dateRange').val();
+        runQuery();
+      });
     </script>
   </body>
 </html>
