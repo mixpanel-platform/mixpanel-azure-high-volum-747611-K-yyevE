@@ -161,7 +161,6 @@
             console.log(pending);
             var sendData = {}
             sendData[eventKey] = queryBounds[0]
-            debugger
             // set(sendData, date)
             if (pending <= 0) {
               drawTable(tableData)
@@ -189,6 +188,7 @@
       
       drawTable= function(data){
         var rows = []
+        debugger
         for (rowDate in data) {
           var value = tableData[rowDate]
           rows.push({
