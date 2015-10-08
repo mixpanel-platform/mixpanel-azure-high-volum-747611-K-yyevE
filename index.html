@@ -146,7 +146,8 @@
             queryBounds = queryBounds.map(suffix)
           }
           catch(err){
-            console.log(event, date)
+            console.log('No Numeric Data found')
+            console.log(part, date)
             queryBounds = ['No Numeric Data']
             pending -= 1;
           }
