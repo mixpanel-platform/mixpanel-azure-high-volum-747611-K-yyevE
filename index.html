@@ -171,7 +171,7 @@
             var propertyStr = '(string(properties["Context_Part_id"]) == "' + property + '") and ' 
             var lowerBound = '(number(properties["Duration"]) >= ' + queryBounds[0];
             var upperBound = ' and number(properties["Duration"]) <=' + queryBounds[1]+ ')';
-            tempParams.where = zero + propertyStr lowerBound + upperBound;
+            tempParams.where = zero + propertyStr + lowerBound + upperBound;
             nestedQuery(percentile, tempParams, event, date, property);
           }
         }).fail(function($xhr) {
