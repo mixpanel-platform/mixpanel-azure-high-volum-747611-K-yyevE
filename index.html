@@ -168,7 +168,7 @@
             }
           } else {
             var zero = 'number(properties["Duration"]) > 0 and '
-            var propertyStr = '(string(properties["Context_Part_id"]) == "' + part + '") and ' 
+            var propertyStr = '(string(properties["Context_Part_bladeId"]) == "' + part + '") and ' 
             var lowerBound = '(number(properties["Duration"]) >= ' + queryBounds[0];
             var upperBound = ' and number(properties["Duration"]) <=' + queryBounds[1]+ ')';
             tempParams.where = zero + propertyStr + lowerBound + upperBound;
@@ -265,7 +265,7 @@
               for (percentIndex in percentiles){
                 percent = percentiles[percentIndex]
                 var zero = 'number(properties["Duration"]) > 0 and '
-                var propertyStr = '(string(properties["Context_Part_id"]) == "' + part + '")'
+                var propertyStr = '(string(properties["Context_Part_bladeId"]) == "' + part + '")'
                 params[part][percent] = {
                   event: 'BladeReady',
                   where: zero + propertyStr,
