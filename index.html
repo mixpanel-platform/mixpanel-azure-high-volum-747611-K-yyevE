@@ -186,6 +186,8 @@
           Expects to be keys of the current values
       */
       
+      // Need to set table params to update
+      
       drawTable= function(data){
         var rows = []
         for (rowDate in data) {
@@ -202,6 +204,7 @@
         }
         
         var table = $('#table').DataTable();
+        table.clear()
         table.rows.add(rows).draw();
       }
       
