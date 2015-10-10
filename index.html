@@ -156,8 +156,12 @@
           if (queryBounds.length == 1) {
             queryData.value = queryBounds[0]
             var eventKey = String(percentile + ' ' + part)
+            var extension = part.split('/')[1]
+            var blade = part.split('/')[3]
             debugger
-            tableData[part][date] = queryBounds[0]
+            tableData[part][percentile] = queryBounds[0]
+            tableData[part]['extension'] = extension
+            tableData[part]['blade'] = blade
             pending -= 1;
             console.log(pending);
             var sendData = {}
@@ -191,17 +195,13 @@
       
       drawTable= function(data){
         var rows = []
-        for (rowDate in data) {
-          var value = tableData[rowDate]
+        for (part in data) {
           debugger
           rows.push({
-            'Date': rowDate,
-            'Median Percentile TotalTimeToPortalReady': value['0.5 TotalTimeToPortalReady'],
-            '95th Percentile TotalTimeToPortalReady': value['0.95 TotalTimeToPortalReady'],
-            'Median Percentile TotalTimeToStartBoardReady': value['0.5 TotalTimeToStartBoardReady'],
-            '95th Percentile TotalTimeToStartBoardReady': value['0.95 TotalTimeToStartBoardReady'],
-            'Median Percentile TotalTimeToDeepLinkReady': value['0.5 TotalTimeToDeepLinkReady'],
-            '95th Percentile TotalTimeToDeepLinkReady': value['0.95 TotalTimeToDeepLinkReady'],
+            'Blade': part.blade,
+            'Extension': part.extension,
+            'Median Percentile': part['.05'],
+            '95th Percentile': part['0.95'],
           })
         }
         
@@ -212,13 +212,10 @@
       
        $('#table').DataTable({
         columns: [
-          { title: "Date", data: "Date" },
-          { title: "Median Percentile Portal Ready", data: "Median Percentile TotalTimeToPortalReady" },
-          { title: "95th Percentile Portal Ready", data: "95th Percentile TotalTimeToPortalReady" },
-          { title: "Median Percentile StartBoard Ready", data: "Median Percentile TotalTimeToStartBoardReady" },
-          { title: "95th Percentile StartBoard Ready", data: "95th Percentile TotalTimeToStartBoardReady" },
-          { title: "Median Percentile DeepLink Ready", data: "Median Percentile TotalTimeToDeepLinkReady" },
-          { title: "95th Percentile Deeplink Ready", data: "95th Percentile TotalTimeToDeepLinkReady" },
+          {title: 'Blade', data: 'Blade'},
+          {title: 'Extension', data: 'Extension'},
+          {title: 'Median Percentile', data: 'Median Percentile'},
+          {title: '95th Percentile', data: '95th Percentile'},
         ]
       })
       
