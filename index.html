@@ -151,16 +151,16 @@
             queryBounds = ['No Numeric Data']
           }
 
-          tableData[date] = tableData[date] || {}
+          tableData[part] = tableData[part] || {}
           
           if (queryBounds.length == 1) {
             queryData.value = queryBounds[0]
             var eventKey = String(percentile + ' ' + part)
-            tableData[date][eventKey] = queryBounds[0]
+            debugger
+            tableData[part][date] = queryBounds[0]
             pending -= 1;
             console.log(pending);
             var sendData = {}
-            debugger
             sendData[date] = queryBounds[0]
             set(sendData, part)
             if (pending <= 0) {
@@ -290,8 +290,8 @@
                   allow_more_buckets:true,
                 };
                 var eventKey = String(percent + ' ' + part)
-                if (forceCache || typeof tableData[date] == 'undefined' || isNaN(tableData[date][eventKey])) {
-                  console.log("Cache non existant: " + date)
+                if (forceCache || typeof tableData[part] == 'undefined' || isNaN(tableData[part][date])) {
+                  console.log("Cache non existant: " + part + ' ' + date)
                   pending += 1;
                   nestedQuery(percent, params[part][percent], event, date, part);
                 }
