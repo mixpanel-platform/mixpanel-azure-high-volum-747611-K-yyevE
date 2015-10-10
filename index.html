@@ -165,7 +165,7 @@
             pending -= 1;
             console.log(pending);
             var sendData = {}
-            sendData[date] = queryBounds[0]
+            sendData[percent + date] = queryBounds[0]
             set(sendData, part)
             if (pending <= 0) {
               drawTable(tableData)
@@ -287,7 +287,7 @@
                   allow_more_buckets:true,
                 };
                 var eventKey = String(percent + ' ' + part)
-                if (forceCache || typeof tableData[part] == 'undefined' || isNaN(tableData[part][date])) {
+                if (forceCache || typeof tableData[part] == 'undefined' || isNaN(tableData[part][percent + date])) {
                   console.log("Cache non existant: " + part + ' ' + date)
                   pending += 1;
                   nestedQuery(percent, params[part][percent], event, date, part);
