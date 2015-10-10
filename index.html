@@ -159,16 +159,13 @@
             var extension = part.split('/')[1]
             var blade = part.split('/')[3]
             debugger
-            tableData[part][percentile] = queryBounds[0]
+            tableData[part][percentile + '-' + date] = queryBounds[0]
             tableData[part]['extension'] = extension
             tableData[part]['blade'] = blade
             pending -= 1;
             console.log(pending);
-            var sendData = {}
-            sendData[percent + date] = queryBounds[0]
-            set(sendData, part)
             if (pending <= 0) {
-              drawTable(tableData)
+              drawTable(tableData) go draw
             }
           } else {
             var zero = 'number(properties["Duration"]) > 0 and '
@@ -196,15 +193,23 @@
       drawTable= function(data){
         var rows = []
         for (part in data) {
-          debugger
-          rows.push({
-            'Blade': data[part]['blade'],
-            'Extension': data[part]['extension'],
-            'Median Percentile': data[part]['.05'],
-            '95th Percentile': data[part]['0.95'],
-          })
+          for(index in datesArray){
+            debugger
+            var date = datesArray[index]
+            rows.push({
+              'Date': date,
+              'Blade': data[part]['blade'],
+              'Extension': data[part]['extension'],
+              'Median Percentile': data[part]['0.5/' + date ],
+              '95th Percentile': data[part]['0.95/' + date],
+            })
+            
+            var sendData = {}
+            sendData['0.5/' + date] = data[part]['0.5/' + date ];
+            sendData['0.95/' + date] = data[part]['0.95/' + date];
+            set(sendData, part)
+          }
         }
-        
         var table = $('#table').DataTable();
         table.clear()
         table.rows.add(rows).draw();
@@ -212,6 +217,7 @@
       
        $('#table').DataTable({
         columns: [
+          {title: 'Date', data: 'Date'},
           {title: 'Blade', data: 'Blade'},
           {title: 'Extension', data: 'Extension'},
           {title: 'Median Percentile', data: 'Median Percentile'},
@@ -227,6 +233,7 @@
         tableData = {}
         var bladePromises = []
         var bladeArray = []
+        var datesArray = []
         pending = 0;
         var table = $('#table').DataTable();
         table
@@ -267,6 +274,7 @@
             
             while (myDate <= new Date(dates.to)) { 
               var date = myDate.toLocaleString().split(',')[0]
+              datesArray.push(date)
               var part = blade
               params[part] = {}
               result[date] = result[date] || {};
@@ -287,7 +295,7 @@
                   allow_more_buckets:true,
                 };
                 var eventKey = String(percent + ' ' + part)
-                if (forceCache || typeof tableData[part] == 'undefined' || isNaN(tableData[part][percent + date])) {
+                if (forceCache || typeof tableData[part] == 'undefined' || isNaN(tableData[part][percent + '/' + date])) {
                   console.log("Cache non existant: " + part + ' ' + date)
                   pending += 1;
                   nestedQuery(percent, params[part][percent], event, date, part);
