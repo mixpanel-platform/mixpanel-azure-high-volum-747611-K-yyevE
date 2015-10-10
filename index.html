@@ -261,7 +261,7 @@
             var myDate = new Date(dates.from)
             var blade = bladeArray[index]
             var bladeObj = promiseArray[index]
-            results = dateObj.results[0]
+            results = bladeObj.results[0]
             if (!$.isEmptyObject(results)) {
               tableData[blade] = results.$properties
             }
