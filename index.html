@@ -226,8 +226,8 @@
         var forceCache = false
         var params = {}
         tableData = {}
-        var datePromises = []
-        var dateArray = []
+        var bladePromises = []
+        var bladeArray = []
         pending = 0;
         var table = $('#table').DataTable();
         table
@@ -241,7 +241,6 @@
         var percentiles = [.5, .95]
         
         result = {}
-        var myDate = new Date(dates.from)
         for (index in bladeList) {
           var blade = bladeList[index]
           bladePromises.push(get(blade));
@@ -259,7 +258,7 @@
           
         Promise.all(bladePromises).then(function(promiseArray){
           for (index in promiseArray) {
-            myDate = new Date(dates.from)
+            var myDate = new Date(dates.from)
             var blade = bladeArray[index]
             var bladeObj = promiseArray[index]
             results = dateObj.results[0]
