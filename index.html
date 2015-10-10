@@ -198,10 +198,10 @@
         for (part in data) {
           debugger
           rows.push({
-            'Blade': part.blade,
-            'Extension': part.extension,
-            'Median Percentile': part['.05'],
-            '95th Percentile': part['0.95'],
+            'Blade': data[part]['blade'],
+            'Extension': data[part]['extension'],
+            'Median Percentile': data[part]['.05'],
+            '95th Percentile': data[part]['0.95'],
           })
         }
         
