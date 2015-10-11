@@ -193,22 +193,19 @@
       drawTable= function(data){
         var rows = []
         for (part in data) {
+          var extension = part.split('/')[1]
+          var blade = part.split('/')[3]
           for(index in datesArray){
             debugger
             var date = datesArray[index]
             rows.push({
               'Date': date,
-              'Blade': data[part]['blade'],
-              'Extension': data[part]['extension'],
+              'Blade': blade,
+              'Extension': extension,
               'Median Percentile': data[part]['0.5/' + date ],
               '95th Percentile': data[part]['0.95/' + date],
             })
-            var extension = part.split('/')[1]
-            var blade = part.split('/')[3]
-            
             var sendData = {}
-            sendData['extension'] = extension
-            sendData['blade'] = blade
             sendData['0.5/' + date] = data[part]['0.5/' + date ];
             sendData['0.95/' + date] = data[part]['0.95/' + date];
             set(sendData, part)
