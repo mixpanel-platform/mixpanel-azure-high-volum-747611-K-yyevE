@@ -155,13 +155,7 @@
           
           if (queryBounds.length == 1) {
             queryData.value = queryBounds[0]
-            var eventKey = String(percentile + ' ' + part)
-            var extension = part.split('/')[1]
-            var blade = part.split('/')[3]
-            debugger
             tableData[part][percentile + '/' + date] = queryBounds[0]
-            tableData[part]['extension'] = extension
-            tableData[part]['blade'] = blade
             pending -= 1;
             console.log(pending);
             if (pending <= 0) {
