@@ -203,8 +203,12 @@
               'Median Percentile': data[part]['0.5/' + date ],
               '95th Percentile': data[part]['0.95/' + date],
             })
+            var extension = part.split('/')[1]
+            var blade = part.split('/')[3]
             
             var sendData = {}
+            sendData['extension'] = extension
+            sendData['blade'] = blade
             sendData['0.5/' + date] = data[part]['0.5/' + date ];
             sendData['0.95/' + date] = data[part]['0.95/' + date];
             set(sendData, part)
