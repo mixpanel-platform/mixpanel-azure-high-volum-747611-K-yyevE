@@ -156,6 +156,9 @@
           if (queryBounds.length == 1) {
             queryData.value = queryBounds[0]
             tableData[part][percentile + '/' + date] = queryBounds[0]
+            var sendData = {}
+            sendData[percentile + '/' + date] = queryBounds[0];
+            set(sendData, part)
             pending -= 1;
             console.log(pending);
             if (pending <= 0) {
@@ -199,10 +202,6 @@
               'Median Percentile': data[part]['0.5/' + date ],
               '95th Percentile': data[part]['0.95/' + date],
             })
-            var sendData = {}
-            sendData['0.5/' + date] = data[part]['0.5/' + date ];
-            sendData['0.95/' + date] = data[part]['0.95/' + date];
-            set(sendData, part)
           }
         }
         var table = $('#table').DataTable();
@@ -255,8 +254,8 @@
           datesArray.push(date)
           myDate.setDate(myDate.getDate() + 1)
         }
-        MP.api.MAX_SIMULTANEOUS_QUERIES = 100
-
+        
+        MP.api.MAX_SIMULTANEOUS_QUERIES = datesArray.length * bladeList.length * percentiles.length
         Promise.all(bladePromises).then(function(promiseArray){
           for (index in promiseArray) {
             var myDate = new Date(dates.from)
