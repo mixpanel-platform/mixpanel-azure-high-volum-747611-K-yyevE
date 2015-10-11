@@ -255,8 +255,7 @@
           datesArray.push(date)
           myDate.setDate(myDate.getDate() + 1)
         }
-        debugger
-        MP.api.max_simulataneous = 4
+        MP.api.MAX_SIMULTANEOUS_QUERIES = 100
 
         Promise.all(bladePromises).then(function(promiseArray){
           for (index in promiseArray) {
