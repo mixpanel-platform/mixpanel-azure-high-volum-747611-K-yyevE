@@ -159,7 +159,7 @@
             var extension = part.split('/')[1]
             var blade = part.split('/')[3]
             debugger
-            tableData[part][percentile + '-' + date] = queryBounds[0]
+            tableData[part][percentile + '/' + date] = queryBounds[0]
             tableData[part]['extension'] = extension
             tableData[part]['blade'] = blade
             pending -= 1;
