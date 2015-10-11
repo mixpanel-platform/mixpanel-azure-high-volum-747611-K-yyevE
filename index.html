@@ -252,16 +252,13 @@
           bladePromises.push(get(blade));
           bladeArray.push(blade)
         }
-        
-        // Invert did from dates to bladename
-        // while (myDate <= new Date(dates.to)) { 
-        //   var date = myDate.toLocaleString().split(',')[0]
-        //   result[date] = {};
-        //   myDate.setDate(myDate.getDate() + 1);
-        //   datePromises.push(get(date));
-        //   dateArray.push(date)
-        // }
-          
+        var myDate = new Date(dates.from)
+        while (myDate <= new Date(dates.to)) {
+          var date = myDate.toLocaleString().split(',')[0]
+          datesArray.push(date)
+          myDate.setDate(myDate.getDate() + 1)
+        }
+
         Promise.all(bladePromises).then(function(promiseArray){
           for (index in promiseArray) {
             var myDate = new Date(dates.from)
@@ -274,7 +271,6 @@
             
             while (myDate <= new Date(dates.to)) { 
               var date = myDate.toLocaleString().split(',')[0]
-              datesArray.push(date)
               var part = blade
               params[part] = {}
               result[date] = result[date] || {};
