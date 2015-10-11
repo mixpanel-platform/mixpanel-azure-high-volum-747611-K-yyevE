@@ -286,7 +286,7 @@
                   on: 'number(properties["Duration"])',
                   unit: 'day',
                   buckets: 2,
-                  allow_more_buckets:true,
+                  allow_more_buckets:false,
                 };
                 var eventKey = String(percent + ' ' + part)
                 if (forceCache || typeof tableData[part] == 'undefined' || isNaN(tableData[part][percent + '/' + date])) {
