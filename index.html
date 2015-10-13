@@ -259,11 +259,12 @@
           var blade = bladeList[index]
           bladePromises.push(get(blade));
         }
-          MP.api.apiKey = tmpApi
-          MP.api.apiSecret = tmpSecret
+
 
 
         Promise.all(bladePromises).then(function(promiseArray){
+          MP.api.apiKey = tmpApi
+          MP.api.apiSecret = tmpSecret
           for (index in bladeList) {
             var myDate = new Date(dates.from)
             var blade = bladeList[index]
