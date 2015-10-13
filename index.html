@@ -241,12 +241,13 @@
          
         var percentiles = [.5, .95]
         result = {}
+        MP.api.MAX_SIMULTANEOUS_QUERIES = datesArray.length * bladeList.length * percentiles.length
         
-       for (index in bladeList) {
+        for (index in bladeList) {
           var tmpApi = MP.api.apiKey
           var tmpSecret = MP.api.apiSecret
-          MP.api.apikey= '18a9b125fbd8ca8dfe7a4e282b309c15'
-          MP.api.apiSecret= '9fac9f10ed6545471f6841ed563ddab7'
+          MP.api.apikey = '18a9b125fbd8ca8dfe7a4e282b309c15'
+          MP.api.apiSecret = '9fac9f10ed6545471f6841ed563ddab7'
           var blade = bladeList[index]
           bladePromises.push(get(blade)); 
         }
@@ -261,7 +262,7 @@
           myDate.setDate(myDate.getDate() + 1)
         }
         
-        MP.api.MAX_SIMULTANEOUS_QUERIES = datesArray.length * bladeList.length * percentiles.length
+        
         Promise.all(bladePromises).then(function(promiseArray){
           for (index in bladeList) {
             var myDate = new Date(dates.from)
