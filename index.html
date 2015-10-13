@@ -245,8 +245,8 @@
        for (index in bladeList) {
           var tmpApi = MP.api.apiKey
           var tmpSecret = MP.api.apiSecret
-          MP.api.apikey('18a9b125fbd8ca8dfe7a4e282b309c15')
-          MP.api.apiSecret('9fac9f10ed6545471f6841ed563ddab7')
+          MP.api.apikey= '18a9b125fbd8ca8dfe7a4e282b309c15'
+          MP.api.apiSecret= '9fac9f10ed6545471f6841ed563ddab7'
           var blade = bladeList[index]
           bladePromises.push(get(blade)); 
         }
