@@ -251,8 +251,8 @@
           bladePromises.push(get(blade)); 
         }
         
-        MP.api.apikey(tmpApi)
-        MP.api.apiSecret(tmpSecret)
+        MP.api.apikey = tmpApi
+        MP.api.apiSecret = tmpSecret
         
         var myDate = new Date(dates.from)
         while (myDate <= new Date(dates.to)) {
