@@ -241,6 +241,14 @@
          
         var percentiles = [.5, .95]
         result = {}
+        
+        var myDate = new Date(dates.from)
+        while (myDate <= new Date(dates.to)) {
+          var date = myDate.toLocaleString().split(',')[0]
+          datesArray.push(date)
+          myDate.setDate(myDate.getDate() + 1)
+        }
+        
         MP.api.MAX_SIMULTANEOUS_QUERIES = datesArray.length * bladeList.length * percentiles.length
         debugger
         for (index in bladeList) {
@@ -254,15 +262,7 @@
         
         MP.api.apiKey = tmpApi
         MP.api.apiSecret = tmpSecret
-        
-        var myDate = new Date(dates.from)
-        while (myDate <= new Date(dates.to)) {
-          var date = myDate.toLocaleString().split(',')[0]
-          datesArray.push(date)
-          myDate.setDate(myDate.getDate() + 1)
-        }
-        
-        
+
         Promise.all(bladePromises).then(function(promiseArray){
           for (index in bladeList) {
             var myDate = new Date(dates.from)
