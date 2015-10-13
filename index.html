@@ -95,7 +95,7 @@
       
       /*  Post Cache */
       send = function(update, distinct) {
-        token = "5e1e1a9c5b3420a5700f9daa06c94c16"
+        token = "a2578edda5beebbe9674b4fcee5f2325"
         $.extend(update, {
           "$token": token,
           "$distinct_id": distinct
@@ -159,7 +159,7 @@
             var sendData = {}
             sendData[percentile + '/' + date] = queryData.value;
             // Commented out to not cache currently
-            // set(sendData, part)
+            set(sendData, part)
             pending -= 1;
             console.log(pending);
             if (pending <= 0) {
@@ -242,12 +242,17 @@
         var percentiles = [.5, .95]
         result = {}
         
-        /*           Not checking people cache
-        for (index in bladeList) {
+       for (index in bladeList) {
+          var tmpApi = MP.api.apiKey
+          var tmpSecret = MP.api.apiSecret
+          MP.api.apikey('18a9b125fbd8ca8dfe7a4e282b309c15')
+          MP.api.apiSecret('9fac9f10ed6545471f6841ed563ddab7')
           var blade = bladeList[index]
           bladePromises.push(get(blade)); 
         }
-        */
+        
+        MP.api.apikey(tmpApi)
+        MP.api.apiSecret(tmpSecret)
         
         var myDate = new Date(dates.from)
         while (myDate <= new Date(dates.to)) {
@@ -262,13 +267,12 @@
             var myDate = new Date(dates.from)
             var blade = bladeList[index]
             
-            /* Not caching Currently
             var bladeObj = promiseArray[index]
             results = bladeObj.results[0]
             if (!$.isEmptyObject(results)) {
               tableData[blade] = results.$properties
             }
-            */
+            
             
             for (dateIndex in datesArray) { 
               var date = datesArray[dateIndex]
