@@ -321,7 +321,8 @@
                 };
                 var eventKey = String(percent + ' ' + part)
                 if (forceCache || typeof tableData[part] == 'undefined' || isNaN(tableData[part][percent + '/' + date])) {
-                  console.log("Cache non existant: " + part + ' ' + date)
+                  console.log("Cache non existant: " + part + ' ' + date + ' ' + percent)
+                  console.log("Total number of Calculations left: " + pending )
                   pending += 1;
                   nestedQuery(percent, params[part][percent], event, date, part);
                 }
