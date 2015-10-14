@@ -248,7 +248,7 @@
           myDate.setDate(myDate.getDate() + 1)
         }
         
-        MP.api.MAX_SIMULTANEOUS_QUERIES = 100
+        MP.api.MAX_SIMULTANEOUS_QUERIES = bladeList.length
         var tmpApi = String(MP.api.apiKey)
         var tmpSecret = String(MP.api.apiSecret)
         MP.api.apiKey = '18a9b125fbd8ca8dfe7a4e282b309c15'
