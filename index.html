@@ -208,6 +208,7 @@
       // Need to set table params to update
       
       drawTable= function(data){
+        spinner.stop();
         var rows = []
         for (part in data) {
           var extension = part.split('/')[1] || 'N/A'
